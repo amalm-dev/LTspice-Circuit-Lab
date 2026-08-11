@@ -1,10 +1,10 @@
-# 🔬 LTspice Circuit Lab
+# LTspice Circuit Lab
 
 An open-source simulation laboratory dedicated to exploring basic circuit theory, semiconductor device physics, and analog integrated circuit (IC) design using **LTspice**.
 
 ---
 
-## 🎯 Laboratory Objectives
+## Laboratory Objectives
 
 * Verify theoretical hand calculations against SPICE simulation models.
 * Characterize passive and active components across linear and non-linear operating regions.
@@ -13,7 +13,7 @@ An open-source simulation laboratory dedicated to exploring basic circuit theory
 
 ---
 
-## 📂 Laboratory Architecture
+## Laboratory Architecture
 
 ```text
 LTspice-Circuit-Lab/
