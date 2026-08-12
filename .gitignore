@@ -1,18 +1,3 @@
-# LTspice Binary & Simulation Output Files
 *.raw
-*.op.raw
-*.fft
 *.log
-*.plt
-*.tmp
-*.bak
-*~
-
-# Auto-generated netlists (keep hand-written .cir / explicit netlists in netlists/)
-*.net.tmp
-
-# System & OS Files
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
+*.op.raw
