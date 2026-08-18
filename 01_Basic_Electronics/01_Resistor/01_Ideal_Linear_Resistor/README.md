@@ -2,57 +2,98 @@
 
 ## Objective
 
-Characterize the current-voltage behaviour of an ideal linear resistor and verify the relationship against hand calculations.
+Characterize the current–voltage behaviour of an ideal linear resistor and verify the result against hand calculation and an LTspice DC sweep.
 
-## Circuit and parameters
+## Circuit
 
-The planned circuit uses a voltage source `V1` and a resistor `R1 = 1 kΩ`. The source will be swept from `-10 V` to `+10 V` with a `10 mV` step. The voltage polarity and current reference direction must be stated in the schematic and report.
+The circuit contains a voltage source `V1` and a `1 kΩ` resistor `R1` connected between node `in` and ground. The current reference is `I(R1)` from node `in` through the resistor to ground.
+
+![Ideal resistor schematic](assets/schematic.png)
+
+## Parameters
+
+| Parameter | Value |
+| --- | ---: |
+| Resistance `R1` | `1 kΩ` |
+| DC sweep source | `V1` |
+| Sweep range | `−10 V` to `+10 V` |
+| Sweep increment | `10 mV` |
+| Evaluation point | `V(in) = 5 V` |
 
 ## Theory
 
 For an ideal resistor,
 
-```text
-I = V/R
-G = 1/R
-P = VI = V²/R
+\[
+I = \frac{V}{R}, \qquad G = \frac{1}{R}, \qquad P = VI = \frac{V^2}{R}.
+\]
+
+With `R = 1 kΩ`, the expected conductance and I–V slope are `1 mS`. At `V = 5 V`, the analytical current is `5 mA` and the analytical power is `25 mW`.
+
+## LTspice analysis
+
+The experiment uses the minimum analysis set needed to answer the static I–V question:
+
+```spice
+.dc V1 -10 10 10m
+.meas DC I_at_5V FIND I(R1) WHEN V(in)=5
 ```
 
-The expected I-V characteristic is linear with slope `1/R`. Power is non-negative for a passive resistor under the adopted sign convention and follows a quadratic relationship with voltage magnitude.
+The schematic and generated netlist are stored in [`simulation/`](simulation/):
 
-## Selected LTspice analyses
+- [`ideal_resistor_iv.asc`](simulation/ideal_resistor_iv.asc)
+- [`ideal_resistor_iv.net`](simulation/ideal_resistor_iv.net)
 
-| Analysis | Status | Engineering purpose |
-| --- | --- | --- |
-| `.dc` | Required | Characterize the I-V relationship |
-| `.op` | Optional | Verify one reference operating point |
-| `.step` | Optional | Study the effect of resistance value |
-| `.ac` | Not required initially | An ideal resistor has frequency-independent impedance |
-| `.tran` | Not required initially | No energy-storage state is being studied |
-| `.noise` | Not required initially | Requires a meaningful resistor noise model and question |
-| Monte Carlo | Later | Move tolerance methodology to the practical resistor study |
-
-## Planned repository files
-
-The schematic and netlist belong in `simulation/`. Handwritten engineering work belongs in `calculations/`. The detailed report and bibliography belong in `documentation/`. Schematic and result figures belong in `assets/`. Generated `.raw` output is intentionally not part of the publication set.
-
-```text
-01_Ideal_Linear_Resistor/
-├── README.md
-├── simulation/
-├── calculations/
-├── documentation/
-└── assets/
-```
+Generated `.raw`, `.log`, and `.db` files are intentionally excluded from the publication set.
 
 ## Results
 
-This section will be completed after the LTspice run. It should include the measured slope, selected current values, power verification, and figures with meaningful captions.
+The LTspice waveform shows a straight-line voltage sweep and a straight-line resistor current, confirming the ideal linear model.
+
+![Simulated I–V curve](assets/iv_curve.png)
+
+![Simulated resistor power](assets/power_curve.png)
+
+The LTspice measurement log reports:
+
+```text
+i_at_5v: I(R1)=0.00499999988824 at 5
+```
+
+Therefore,
+
+```text
+I_SPICE = 4.99999988824 mA
+```
 
 ## Analytical versus SPICE comparison
 
-The final comparison should report analytical value, simulated value, absolute error, relative error, and an interpretation of any discrepancy. Do not fill this table with unverified values.
+| Quantity | Analytical | LTspice | Interpretation |
+| --- | ---: | ---: | --- |
+| Current at `5 V` | `5.00000000000 mA` | `4.99999988824 mA` | Agreement to numerical precision |
+| Absolute current difference | — | approximately `0.11176 nA` | Solver/display precision |
+| Relative current difference | — | approximately `2.24 × 10⁻⁶ %` | Negligible for this ideal model |
+| Power at `5 V` | `25 mW` | Consistent with `V(in)·I(R1)` | Quadratic voltage dependence |
+
+The difference is not a physical modelling error. It is consistent with numerical representation and solver precision in the ideal model.
+
+The detailed derivation is in [`calculations/hand_calculation.md`](../calculations/hand_calculation.md) and [`calculations/hand_calculation.pdf`](../calculations/hand_calculation.pdf). The formal report is in [`documentation/experiment_report.pdf`](../documentation/experiment_report.pdf), with editable source in [`documentation/experiment_report.tex`](../documentation/experiment_report.tex) and bibliography data in [`documentation/references.bib`](../documentation/references.bib).
 
 ## Engineering insight
 
-The ideal resistor is the baseline for later work on combinations, tolerance, temperature coefficient, noise, and nonlinear models. It is intentionally small: the goal is to establish a reliable experiment format before increasing circuit complexity.
+The ideal resistor establishes the baseline conventions for this laboratory: current direction, voltage polarity, units, analysis selection, numerical measurement, and analytical comparison. Later experiments will extend this baseline to resistor combinations, tolerance and Monte Carlo methods, temperature coefficient, thermal noise, parasitics, and nonlinear modelling.
+
+## Limitations
+
+This experiment does not model tolerance, temperature coefficient, voltage coefficient, power coefficient, parasitic inductance or capacitance, or physical resistor noise. Those effects belong in the later practical-resistor and advanced-analysis experiments.
+
+## Reproducibility record
+
+| Item | Record |
+| --- | --- |
+| Simulator | LTspice x64 `24.1.10` for Windows |
+| Primary analysis | `.dc` sweep |
+| Measurement | `.meas DC I_at_5V FIND I(R1) WHEN V(in)=5` |
+| Simulation artefacts | `simulation/ideal_resistor_iv.asc`, `simulation/ideal_resistor_iv.net` |
+| Visual evidence | `assets/schematic.png`, `assets/iv_curve.png`, `assets/power_curve.png` |
+| Report date | `19 August 2026` |

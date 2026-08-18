@@ -1,0 +1,170 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\addbibresource{references.bib}
+\usepackage{xcolor}
+
+% In the repository, assets are one directory above documentation/.
+% In Overleaf, assets/ is beside the .tex file. This supports both layouts.
+\def\assetdir{assets/}
+\IfFileExists{../assets/schematic.png}{\def\assetdir{../assets/}}{}
+
+\geometry{margin=25mm}
+\sisetup{per-mode=symbol}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue}
+
+\title{Experiment 01: Characterization of an Ideal Linear Resistor}
+\author{Amal Madhu\\M.Tech VLSI Design}
+\date{19 August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This experiment characterizes the current--voltage behaviour of a \SI{1}{\kilo\ohm} ideal resistor using LTspice. A DC sweep from \SI{-10}{\volt} to \SI{10}{\volt} with a \SI{10}{\milli\volt} step was performed. The expected linear relationship, $I=V/R$, was compared with the LTspice result. At an applied voltage of \SI{5}{\volt}, the analytical current is \SI{5}{\milli\ampere}, while LTspice reports \SI{4.99999988824}{\milli\ampere}. The relative difference is approximately $2.24\times10^{-6}\,\%$, which is consistent with numerical solver precision. The experiment establishes the baseline format for subsequent passive, semiconductor, MOSFET, CMOS, analog, and process-aware studies.
+\end{abstract}
+
+\section{Introduction}
+
+A reliable circuit laboratory begins with models whose expected behaviour can be derived before simulation. The ideal resistor is the simplest passive model that establishes the relationship between voltage, current, conductance, and power. It also provides a reference against which practical resistance tolerance, temperature coefficient, thermal noise, and nonlinear models can later be compared.
+
+The objective of this experiment is to characterize the ideal resistor's I--V relationship and verify that the simulation agrees with the analytical model across the selected DC sweep.
+
+\section{Theoretical Background}
+
+For an ideal resistor of resistance $R$, Ohm's law is
+\begin{equation}
+I = \frac{V}{R}.
+\end{equation}
+
+The conductance is
+\begin{equation}
+G = \frac{1}{R},
+\end{equation}
+
+and the dissipated power is
+\begin{equation}
+P = VI = \frac{V^2}{R}.
+\end{equation}
+
+For $R=\SI{1}{\kilo\ohm}$, the expected I--V slope is $G=\SI{1}{\milli\siemens}$. The current is negative for negative voltage under the adopted reference direction, while the resistor power remains non-negative because it depends on $V^2$.
+
+\section{Circuit Under Test}
+
+The circuit consists of an independent voltage source $V_1$ connected from node \texttt{in} to ground and a \SI{1}{\kilo\ohm} resistor $R_1$ connected from node \texttt{in} to ground. The voltage source is swept from \SI{-10}{\volt} to \SI{10}{\volt}. The LTspice schematic is stored at:
+
+\begin{verbatim}
+01_Basic_Electronics/01_Resistor/01_Ideal_Linear_Resistor/
+  simulation/ideal_resistor_iv.asc
+\end{verbatim}
+
+\section{Analytical Derivation}
+
+At $V=\SI{5}{\volt}$,
+\begin{equation}
+I_{analytical}=\frac{\SI{5}{\volt}}{\SI{1}{\kilo\ohm}}
+=\SI{5}{\milli\ampere}.
+\end{equation}
+
+The corresponding power is
+\begin{equation}
+P_{5\,\mathrm{V}} = \frac{(\SI{5}{\volt})^2}{\SI{1}{\kilo\ohm}}
+= \SI{25}{\milli\watt}.
+\end{equation}
+
+The full analytical current sweep is $I=V/\SI{1}{\kilo\ohm}$, which predicts a straight line crossing the origin.
+
+\section{Simulation Methodology}
+
+The experiment uses a DC sweep because the engineering question concerns the static I--V characteristic. The directive is documented in the LTspice workflow provided by Analog Devices \cite{analogdevices_ltspice}:
+
+\begin{verbatim}
+.dc V1 -10 10 10m
+.meas DC I_at_5V FIND I(R1) WHEN V(in)=5
+\end{verbatim}
+
+The generated netlist is stored at:
+
+\begin{verbatim}
+01_Basic_Electronics/01_Resistor/01_Ideal_Linear_Resistor/
+  simulation/ideal_resistor_iv.net
+\end{verbatim}
+
+No transient, AC, noise, temperature, or Monte Carlo analysis is required for the ideal-resistor question. Those methods become meaningful in later experiments when energy storage, frequency response, device noise, temperature coefficients, or variation are introduced.
+
+\section{Results}
+
+The LTspice waveform shows a linear node-voltage sweep and a linear resistor current. At $V(in)=\SI{5}{\volt}$, the measurement log reports:
+
+\begin{verbatim}
+i_at_5v: I(R1)=0.00499999988824 at 5
+\end{verbatim}
+
+This corresponds to \SI{4.99999988824}{\milli\ampere}. The experiment assets are stored in the corresponding \texttt{assets/} directory as \texttt{schematic.png}, \texttt{iv\_curve.png}, and \texttt{power\_curve.png}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{\assetdir schematic.png}
+  \caption{Ideal linear resistor schematic used for the DC sweep.}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{\assetdir iv_curve.png}
+  \caption{Simulated voltage and resistor-current traces over the DC sweep.}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{\assetdir power_curve.png}
+  \caption{Calculated resistor power, $P=V(in)I(R1)$, over the DC sweep.}
+\end{figure}
+
+\section{Analytical Versus SPICE Comparison}
+
+\begin{table}[htbp]
+\centering
+\caption{Comparison at $V=\SI{5}{\volt}$.}
+\begin{tabular}{lcc}
+\toprule
+Quantity & Analytical & LTspice \\
+\midrule
+Current & \SI{5.00000000000}{\milli\ampere} & \SI{4.99999988824}{\milli\ampere} \\
+Absolute difference & \multicolumn{2}{c}{approximately \SI{0.11176}{\nano\ampere}} \\
+Relative difference & \multicolumn{2}{c}{approximately $2.24\times10^{-6}\,\%$} \\
+Power & \SI{25}{\milli\watt} & consistent with $VI$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The discrepancy is far below any meaningful physical uncertainty in a real resistor. It is attributed to numerical representation and solver precision rather than to a mismatch between the circuit model and the analytical equation.
+
+\section{Discussion}
+
+The experiment confirms that the ideal-resistor model is linear, memoryless, and frequency-independent under the assumptions used here. The current reverses sign with the applied voltage, while the dissipated power follows a quadratic dependence on voltage magnitude. The result also demonstrates why an experiment README should remain concise while the report records the assumptions, methodology, numerical comparison, and limitations in detail.
+
+\section{Engineering Insights}
+
+The ideal resistor is not merely a beginner exercise. It establishes the conventions needed for later mixed-signal work: reference direction, units, sign interpretation, model scope, analysis selection, and comparison against a baseline. The same workflow will later be applied to device characterization, MOSFET operating regions, CMOS transfer characteristics, analog amplifier gain, feedback stability, noise, and process-aware CMOS studies.
+
+\section{Limitations}
+
+This experiment uses an ideal resistor and therefore excludes tolerance, temperature coefficient, parasitic inductance and capacitance, voltage coefficient, power coefficient, and physical noise modelling. The numerical agreement should not be interpreted as validation of a practical resistor model. Those effects belong in the dedicated experiments defined elsewhere in the repository.
+
+\section{Conclusion}
+
+The LTspice simulation verifies the analytical relationship $I=V/R$ for a \SI{1}{\kilo\ohm} ideal resistor over a \SI{-10}{\volt} to \SI{10}{\volt} DC sweep. At \SI{5}{\volt}, the measured current agrees with the analytical \SI{5}{\milli\ampere} result to numerical precision. The experiment is complete as a reproducible baseline and is ready to be committed with its schematic, netlist, figures, calculation record, and report.
+
+\nocite{sedra_smith,ltspice_help}
+\printbibliography
+
+\end{document}
