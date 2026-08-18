@@ -1,0 +1,12 @@
+* text=auto
+*.md text eol=lf
+*.sh text eol=lf
+*.asc text eol=lf
+*.net text eol=lf
+*.tex text eol=lf
+*.bib text eol=lf
+*.csv text eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.raw binary

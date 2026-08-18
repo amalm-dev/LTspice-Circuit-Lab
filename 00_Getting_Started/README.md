@@ -1,35 +1,19 @@
-# 00: Getting Started & Laboratory Standards
+# Getting Started
 
-Welcome to the **LTspice Circuit Analysis & Design Laboratory**. This directory outlines the workflow, naming conventions, directory structure, and SPICE simulation standards used across all lab experiments.
+This section is the documentation layer for the laboratory. It is intentionally not an experiment collection. Read it before adding a new circuit so that the repository remains organized by engineering subject and physical concept rather than by duplicated analysis commands.
 
----
+## Recommended reading order
 
-## 1. Repository Directory Structure
+| Order | Document | Purpose |
+| --- | --- | --- |
+| 1 | [LTspice Workflow](LTspice_Workflow.md) | Move from question to reproducible commit |
+| 2 | [SPICE Syntax](SPICE_Syntax.md) | Read and write netlists safely |
+| 3 | [Simulation Analyses](Simulation_Analyses.md) | Choose analyses with the correct assumptions |
+| 4 | [Measurement Commands](Measurement_Commands.md) | Turn plots into numerical evidence |
+| 5 | [Parameter Sweeps](Parameter_Sweeps.md) | Study design variables systematically |
+| 6 | [Monte Carlo and Tolerance](Monte_Carlo_and_Tolerance.md) | Model manufacturing and component variation |
+| 7 | [Temperature Analysis](Temperature_Analysis.md) | Evaluate thermal sensitivity when relevant |
+| 8 | [Behavioral Models](Behavioral_Models.md) | Use abstraction without hiding assumptions |
+| 9 | [Laboratory Standards](Laboratory_Standards.md) | Apply naming, evidence, and Git hygiene |
 
-The repository is structured hierarchically by topic, sub-topic, and specific experimental setup:
-
-```text
-LTspice-Circuit-Lab/
-├── 00_Getting_Started/             # Setup guides, standards, and SPICE basics
-├── 01_Basic_Electronics/           # Linear/Non-linear passive elements, KVL/KCL
-│   ├── 01_Linear_Resistor/
-│   │   ├── 01_Ideal_Resistor/      # Individual experiment folder
-│   │   │   ├── assets/             # Screenshots, plots, and figures (.png)
-│   │   │   ├── circuit.asc         # LTspice schematic source file
-│   │   │   ├── circuit.net         # Generated SPICE netlist
-│   │   │   ├── circuit.log         # LTspice simulation log
-│   │   │   └── README.md           # Formal experiment report
-│   │   └── 02_Series_Parallel/
-│   └── 02_Non_Linear_Resistor/
-├── 02_Circuit_Analysis/            # Thevenin, Norton, Nodal, Mesh, Superposition
-├── 03_RLC_Circuits/                # Transient response, resonance, filters
-├── 04_Semiconductor_Devices/       # Diodes, Zener regulation, rectifiers
-├── 05_MOSFET/                      # MOSFET \(I\text{--}V\) characteristics, biasing
-├── 06_CMOS/                        # CMOS digital logic, inverters, switching dynamics
-├── 07_Analog_Amplifiers/           # Common Source, Common Emitter, frequency response
-├── 08_Operational_Amplifiers/      # Inverting, Non-inverting, Integrator, Active Filters
-├── 09_Feedback_Stability/          # Pole-zero analysis, Bode plots, Phase Margin
-├── 10_Noise/                       # Thermal, flicker, and equivalent noise spectral density
-├── 11_Advanced_Analysis/           # Monte Carlo, Worst-Case, Temperature sweeps
-└── 12_CMOS_180nm/                  # Sub-micron CMOS technology node modeling
-```
+The central discipline is to derive the expected behaviour before opening the waveform viewer. Simulation is evidence for a model; it is not a substitute for understanding the model.
