@@ -1,0 +1,191 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\addbibresource{references.bib}
+\usepackage{xcolor}
+
+\def\assetdir{assets/}
+\IfFileExists{../assets/schematic.png}{\def\assetdir{../assets/}}{}
+
+\geometry{margin=25mm}
+\sisetup{per-mode=symbol}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue}
+
+\title{Experiment 02: Series and Parallel Resistors}
+\author{Amal Madhu\\M.Tech VLSI Design}
+\date{19 August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This experiment verifies the equivalent-resistance rules for series and parallel resistor networks using LTspice operating-point analysis. The series network contains a \SI{9}{\volt} source and \SI{1}{\kilo\ohm} and \SI{2}{\kilo\ohm} resistors. The parallel network uses the same source voltage and resistor values in separate branches. Analytical calculations predict a \SI{3}{\milli\ampere} series current, voltage drops of \SI{3}{\volt} and \SI{6}{\volt}, and parallel branch currents of \SI{9}{\milli\ampere} and \SI{4.5}{\milli\ampere}. LTspice agrees with these values to numerical solver precision. The experiment demonstrates voltage division, current division, Kirchhoff's voltage law, and power distribution.
+\end{abstract}
+
+\section{Introduction}
+
+The topology of a resistor network determines how voltage and current are distributed. In a series network, the same current flows through each element and the total resistance is the sum of the individual resistances. In a parallel network, each branch shares the same voltage and the total current is the sum of the branch currents. These rules are foundational for bias networks, sensor interfaces, current mirrors, feedback paths, and power-distribution networks.
+
+The objective is to verify these relationships using a reproducible LTspice operating-point simulation and to compare the numerical results against hand calculations.
+
+\section{Theoretical Background}
+
+For two series resistors,
+\begin{equation}
+R_{eq,s}=R_1+R_2.
+\end{equation}
+
+For two parallel resistors,
+\begin{equation}
+R_{eq,p}=\frac{R_3R_4}{R_3+R_4}.
+\end{equation}
+
+In the series network, the current is
+\begin{equation}
+I_s=\frac{V_1}{R_1+R_2},
+\end{equation}
+
+and the individual voltage drops are $V_{R1}=I_sR_1$ and $V_{R2}=I_sR_2$. In the parallel network, the branch currents are $I_{R3}=V_2/R_3$ and $I_{R4}=V_2/R_4$, while the source current is their sum.
+
+\section{Circuit Under Test}
+
+The schematic contains two independent networks sharing only the ground reference. The series network uses $V_1=\SI{9}{\volt}$, $R_1=\SI{1}{\kilo\ohm}$, and $R_2=\SI{2}{\kilo\ohm}$. The parallel network uses $V_2=\SI{9}{\volt}$, $R_3=\SI{1}{\kilo\ohm}$, and $R_4=\SI{2}{\kilo\ohm}$.
+
+The LTspice schematic and netlist are stored at:
+
+\begin{verbatim}
+simulation/series_parallel_resistors.asc
+simulation/series_parallel_resistors.net
+\end{verbatim}
+
+\section{Analytical Derivation}
+
+For the series network,
+\begin{equation}
+R_{eq,s}=\SI{3}{\kilo\ohm},
+\qquad
+I_s=\frac{\SI{9}{\volt}}{\SI{3}{\kilo\ohm}}=\SI{3}{\milli\ampere}.
+\end{equation}
+
+Thus,
+\begin{equation}
+V_{R1}=\SI{3}{\milli\ampere}\times\SI{1}{\kilo\ohm}=\SI{3}{\volt},
+\end{equation}
+\begin{equation}
+V_{R2}=\SI{3}{\milli\ampere}\times\SI{2}{\kilo\ohm}=\SI{6}{\volt}.
+\end{equation}
+
+For the parallel network,
+\begin{equation}
+R_{eq,p}=\frac{(\SI{1}{\kilo\ohm})(\SI{2}{\kilo\ohm})}{\SI{3}{\kilo\ohm}}
+=\SI{666.6667}{\ohm}.
+\end{equation}
+
+The branch currents are
+\begin{equation}
+I_{R3}=\frac{\SI{9}{\volt}}{\SI{1}{\kilo\ohm}}=\SI{9}{\milli\ampere},
+\qquad
+I_{R4}=\frac{\SI{9}{\volt}}{\SI{2}{\kilo\ohm}}=\SI{4.5}{\milli\ampere},
+\end{equation}
+
+so the total parallel current is \SI{13.5}{\milli\ampere}. The expected series and parallel powers are \SI{27}{\milli\watt} and \SI{121.5}{\milli\watt}, respectively.
+
+\section{Simulation Methodology}
+
+An operating-point analysis is sufficient because the question concerns static DC relationships. The measurement directives are:
+
+\begin{verbatim}
+.op
+.meas OP I_SERIES FIND I(R1)
+.meas OP V_DROP_R1 FIND V(n_s0,n_s1)
+.meas OP V_DROP_R2 FIND V(n_s1)
+.meas OP I_PARALLEL_R3 FIND I(R3)
+.meas OP I_PARALLEL_R4 FIND I(R4)
+.meas OP V_PARALLEL FIND V(n_p)
+\end{verbatim}
+
+No transient, AC, noise, temperature, or Monte Carlo analysis is needed for this ideal-network experiment.
+
+\section{Results}
+
+The LTspice operating-point log reports:
+
+\begin{verbatim}
+I(R1) = 0.003000000002608 A
+V(n_s0,n_s1) = 3 V
+V(n_s1) = 6 V
+I(R3) = 0.008999999961257 A
+I(R4) = 0.004499999980628 A
+V(n_p) = 9 V
+\end{verbatim}
+
+The evidence images are stored under \texttt{assets/}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{\assetdir schematic.png}
+  \caption{Series and parallel resistor networks used for the operating-point analysis.}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.90\textwidth]{\assetdir operating_point.png}
+  \caption{Operating-point voltages and branch currents reported by LTspice.}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{\assetdir measurement_log.png}
+  \caption{Numerical measurement results from the LTspice output log.}
+\end{figure}
+
+\section{Analytical Versus SPICE Comparison}
+
+\begin{table}[htbp]
+\centering
+\caption{Comparison of analytical and LTspice results.}
+\begin{tabular}{lccc}
+\toprule
+Quantity & Analytical & LTspice & Interpretation \\
+\midrule
+Series current & \SI{3.000000}{\milli\ampere} & \SI{3.000000002608}{\milli\ampere} & Numerical agreement \\
+$R_1$ voltage drop & \SI{3.000000}{\volt} & \SI{3.000000}{\volt} & Voltage division verified \\
+$R_2$ voltage drop & \SI{6.000000}{\volt} & \SI{6.000000}{\volt} & KVL verified \\
+$R_3$ branch current & \SI{9.000000}{\milli\ampere} & \SI{8.999999961257}{\milli\ampere} & Current division verified \\
+$R_4$ branch current & \SI{4.500000}{\milli\ampere} & \SI{4.499999980628}{\milli\ampere} & Current division verified \\
+Parallel voltage & \SI{9.000000}{\volt} & \SI{9.000000}{\volt} & Equal branch voltage verified \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The small differences in current are consistent with numerical solver precision. There is no physical-model discrepancy because all resistors are ideal.
+
+\section{Discussion}
+
+The simulation confirms that series resistors share current and divide voltage in proportion to resistance. It also confirms that parallel resistors share voltage and divide current inversely according to resistance. The two networks provide complementary tests of topology and conservation laws: KVL governs the voltage sum in the series path, while KCL governs the current sum in the parallel network.
+
+\section{Engineering Insights}
+
+These relationships are directly useful in mixed-signal IC design and hardware systems. Voltage-divider networks establish bias points, parallel devices distribute current, and equivalent-resistance reasoning simplifies larger networks before transistor-level analysis. The same discipline will later support MOSFET biasing, current mirrors, differential pairs, sensor front ends, feedback networks, and embedded power interfaces.
+
+\section{Limitations}
+
+The experiment uses ideal resistors and ideal voltage sources. It does not include source resistance, tolerance, temperature dependence, parasitic impedance, contact resistance, or measurement loading. Those effects should be introduced only when they become relevant to the engineering question.
+
+\section{Conclusion}
+
+The LTspice operating-point simulation verifies the analytical series and parallel resistor relationships. The measured series current, voltage drops, parallel branch currents, and parallel node voltage agree with hand calculations to numerical precision. The experiment establishes a reproducible network-analysis baseline for later circuit and mixed-signal studies.
+
+\nocite{analogdevices_ltspice,sedra_smith}
+\printbibliography
+
+\end{document}
